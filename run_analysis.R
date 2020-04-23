@@ -36,8 +36,11 @@ activity_labels <- read.table("rawdata/UCI_HAR_Dataset/activity_labels.txt")
 colnames(activity_labels)[1] = ACTIVITY_CODE_JOIN_COL
 colnames(activity_labels)[2] = "activity"
 data <- inner_join(activity_labels, data, ACTIVITY_CODE_JOIN_COL)
+data$activity_code <- NULL
 
 # Release transient memory
 rm(activity_labels)
 
+# Create the mean summary table
+mean_summary_by_subject_activity <- group_by(data, subject, activity) %>% summarize_all(function(x) mean(x))
 
