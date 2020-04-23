@@ -20,10 +20,10 @@ train_data$ACTIVITY_CODE_JOIN_COL <- read.csv("rawdata/UCI_HAR_Dataset/train/y_t
 train_data$subject <- read.csv("rawdata/UCI_HAR_Dataset/train/subject_train.txt", header=FALSE)[,1]
 
 # Combine the training and test sets together
-data <- rbind(train_data, test_data)
+means_and_stds <- rbind(train_data, test_data)
 
 # Give proper names to each column
-names(data) <- c(as.character(feature_names[mean_std_cols]), ACTIVITY_CODE_JOIN_COL, "subject")
+names(means_and_stds) <- c(as.character(feature_names[mean_std_cols]), ACTIVITY_CODE_JOIN_COL, "subject")
 
 # Release transient memory
 rm(feature_names)
@@ -35,12 +35,12 @@ rm(test_data)
 activity_labels <- read.table("rawdata/UCI_HAR_Dataset/activity_labels.txt")
 colnames(activity_labels)[1] = ACTIVITY_CODE_JOIN_COL
 colnames(activity_labels)[2] = "activity"
-data <- inner_join(activity_labels, data, ACTIVITY_CODE_JOIN_COL)
-data$activity_code <- NULL
+means_and_stds <- inner_join(activity_labels, means_and_stds, ACTIVITY_CODE_JOIN_COL)
+means_and_stds$activity_code <- NULL
 
 # Release transient memory
 rm(activity_labels)
 
 # Create the mean summary table
-mean_summary_by_subject_activity <- group_by(data, subject, activity) %>% summarize_all(function(x) mean(x))
+mean_summary_by_subject_activity <- group_by(means_and_stds, subject, activity) %>% summarize_all(function(x) mean(x))
 
